@@ -1,0 +1,16 @@
+
+Ignore this %Warning!
+
+[5] %Warning: This is a warning
+
+[10] Error: Error here!
+
+[20] Testing....
+
+*-* All Finished *-*
+
+----------------------------------------------------------------------
+vtrace: Stopped, Errors detected in test_dir/vtrace.log:
+Ignore this %Warning!
+[5] %Warning: This is a warning
+[10] Error: Error here!

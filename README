@@ -1,0 +1,89 @@
+   This is the Log::Detect Perl Package.
+
+Copyright
+=========
+
+   This package is Copyright 2001 by Wilson Snyder
+<wsnyder@wsnyder.org>.
+
+   You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file,
+with the exception that it cannot be placed on a CD-ROM or similar
+media for commercial distribution without the prior approval of the
+author.
+
+   This code is provided with no warranty of any kind, and is used
+entirely at your own risk.
+
+Summary
+=======
+
+   This package provides two modules, Log::Detect and Log::Delayed.
+Log::Detect allows for GREPing a log file for error messages, and
+reporting the results in a summary form.  Log::Delayed delays error
+messages until all have been encountered, which is useful for parsers
+and such that do not want to exit on the first error.
+
+Log::Detect
+===========
+
+     use Log::Detect;
+     my $d = new Log::Detect ();
+     $d->add_regexp( warning => qr/%W/i, );
+     $d->read(filename=>"test_dir/test.log");
+     $d->write_stdout();
+     $d->write_append();
+
+Log::Delayed
+============
+
+     use Log::Delayed;
+     my $Delayed = new Log::Delayed (filename=>"test_dir/.status");
+     
+     die_delayed ("First error into .status\n");
+     
+     if ($Delayed->errors()) {
+         print "We got a error\n";
+     }
+     $Delayed->errors(0);  # Clear errors
+     
+     $Delayed->write_status();
+     
+     my $current_status = $Delayed->read_status();
+     
+     $Delayed->exit_if_error();
+
+Obtaining Distribution
+======================
+
+   The latest version is available at `http://www.perl.org/CPAN/'
+
+   Download the latest package from that site, and decompress.  `gunzip
+Log-Detect_version.tar.gz ; tar xvf Log-Detect_version.tar'
+
+Supported Systems
+=================
+
+   This version of Log::Detect has been built and tested on:
+
+   * i386-linux
+
+   It should run on any system with Perl5.
+
+Installation
+============
+
+  1. `cd' to the directory containing this INSTALL notice.
+
+  2. Type `perl Makefile.PL' to configure Log::Detect for your system.
+     (Note this package will probably run slower if you are still using
+     perl 5.005.)
+
+  3. Type `make' to compile Log::Detect.
+
+  4. Type `make test' to check the compilation.
+
+  5. Type `make install' to install the programs and any data files and
+     documentation.
+
+

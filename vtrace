@@ -1,0 +1,176 @@
+#!/usr/local/bin/perl
+#=============================================================================
+# $Id: vtrace,v 1.4 2001/04/17 17:03:51 wsnyder Exp $
+#=============================================================================
+#
+# This program creates a define group file for waves
+# 
+# This program is Copyright 1998 by Wilson Snyder.
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# If you do not have a copy of the GNU General Public License write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
+# MA 02139, USA.
+
+require 5.005;
+use Getopt::Long;
+use IO::File;
+use Pod::Text;
+
+use Log::Detect;
+use Log::Delayed;
+use strict;
+use vars qw($Debug @More_Warnings $Detect);
+
+#======================================================================
+
+# Warnings to add to Detect's:
+@More_Warnings =
+    ( ignore => qr/Warning ?: (License|ACC\/CLI capabilities have been enabled)/,
+      );
+
+#======================================================================
+# main
+
+$Detect = new Log::Detect
+    (dino => undef,
+     warn_fatal => 1,
+     warn_finish => 1,
+     );
+$Detect->add_regexp(@More_Warnings);
+
+$Debug = 0;
+my $opt_stderr;
+my $opt_append;
+my $result_filename = undef;
+my @files = ();
+
+if (!GetOptions (
+		 "help"		=> \&usage,
+		 "debug"	=> \&debug,
+		 "stderr!"	=> \$opt_stderr,
+		 "append!"	=> \$opt_append,
+		 "warnfatal!"	=> sub {shift; $Detect->set(warn_fatal => shift);},
+		 "warnfinish!"	=> sub {shift; $Detect->set(warn_finish => shift);},
+		 "dino=s"	=> sub {shift; $Detect->set(dino => shift);},
+		 "result=s"	=> \$result_filename,
+		 "<>"		=> \&parameter,
+		 )) {
+    usage();
+}
+
+($#files >= 0) or die "%Error: A .log file must be provided.\n";
+
+foreach my $file (@files) {
+    $Detect->read (filename=>$file);
+}
+
+# Write outputs
+$Detect->write_append () if ($opt_append);
+$Detect->write_stderr () if ($opt_stderr);
+$Detect->write_dino () if $Detect->{dino};
+
+my ($stat,$sum) = $Detect->summary();
+if ($result_filename) {
+    my $Delayed = new Log::Delayed (filename=>$result_filename,
+				    global=>1,);
+    $Delayed->status($stat) if $stat;
+    print "vtrace: fatal_exit: $stat\n" if $Debug;
+}
+exit(defined $stat?10:0);
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print '$Id: vtrace,v 1.4 2001/04/17 17:03:51 wsnyder Exp $ ', "\n";
+    $SIG{__WARN__} = sub{};	#pod2text isn't clean.
+    pod2text($0);
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    push @files, $param;
+}
+
+######################################################################
+1;
+__END__
+
+=head1 NAME
+
+vtrace - read log files to check for errors and create Dinotrace cursors
+
+=head1 SYNOPSIS
+
+C<vtrace> I<filename.log[.gz]>
+
+=head1 DESCRIPTION
+
+Vtrace reads the log files requested and optionally creates a Dinotrace
+file that places cursors at appropriate error or warning points.  The exit
+status will tell if any error or warnings were encountered in the file.
+
+=head1 ARGUMENTS
+
+vtrace takes the following arguments:
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --append
+
+Appends warning and error summary to end of the log file.
+
+=item --dino I<name>
+
+Filename to write a Dinotrace config file to.
+
+=item --stderr
+
+Shows errors and warnings in the log file onto stderr.
+
+=item --warnfatal
+
+Returns fatal exit status on warnings
+
+=item --warnfinish
+
+Returns fatal exit status if a magic line indicating test completion
+is missing.
+
+=back
+
+=head1 EXAMPLES
+
+C<vtrace -stderr vcs.log>
+
+=head1 DISTRIBUTION
+
+The latest version is available from
+C<http://veripool.com/vtrace.html>.
+
+=head1 SEE ALSO
+
+C<Log::Detect>
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=cut

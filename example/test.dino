@@ -1,0 +1,13 @@
+# Dinotrace
+# Created automagically on Wed Apr 11 09:20:54 2001 by $Id: test.dino,v 1.2 2001/04/11 15:39:22 wsnyder Exp $ 
+
+# Error/Warning cursors
+#*-* All Finished *-*
+
+#[10] Error: Error here!
+cursor_add 10 2 "[10] Error: Error here!"
+
+#[5] %Warning: This is a warning
+cursor_add 5 7 "[5] %Warning: This is a warning"
+
+
