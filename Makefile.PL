@@ -1,4 +1,4 @@
-# $Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $
+# $Revision: #9 $$Date: 2002/08/22 $$Author: wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'perl Makefile.PL' to create a Makefile for this package
 
 require 5.005;
@@ -34,7 +34,7 @@ clean::
 }
 
 WriteMakefile(
-	      VERSION_FROM => 'Log/Detect.pm',
+	      VERSION_FROM => 'lib/Log/Detect.pm',
 	      DISTNAME  => 'Log-Detect',
 	      NAME      => 'Log::Detect',
 	      AUTHOR	=> 'Wilson Snyder <wsnyder@wsnyder.org>',

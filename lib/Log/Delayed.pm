@@ -1,5 +1,5 @@
 # Log::Delayed - Delayed error handling
-# $Revision: #5 $$Date: 2002/08/14 $$Author: wsnyder $
+# $Revision: #2 $$Date: 2002/08/22 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -32,7 +32,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.410';
+$VERSION = '1.411';
 
 ######################################################################
 #### Traps

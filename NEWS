@@ -1,0 +1,25 @@
+Log::Detect NEWS --  history of user-visible changes.
+Copyright (C) 2002 Wilson Snyder.
+See the end for copying conditions.
+
+The contributors that suggested a given feature is shown in [].
+	
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+* Changes in Log::Detect 1.411 8/22/2002
+
+****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
+
+----------------------------------------------------------------------
+$Id: //depot/hw/main/utils/perltools/Log-Detect/NEWS#1 $
+----------------------------------------------------------------------
+Copyright information:
+
+Copyright (C) 2001 Wilson Snyder
+
+   See the README file included with this file for licencing information.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	]*$"
+end:

@@ -1,5 +1,5 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $
+# $Revision: #2 $$Date: 2002/08/22 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -31,7 +31,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.410';
+$VERSION = '1.411';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -219,7 +219,7 @@ sub write_dino {
 
     print $fh "# Dinotrace\n";
     print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $ ', "\n";
+    print $fh '$Revision: #2 $$Date: 2002/08/22 $$Author: wsnyder $ ', "\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
