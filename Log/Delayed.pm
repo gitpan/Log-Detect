@@ -1,5 +1,5 @@
 # Log::Delayed - Delayed error handling
-# $Id: Delayed.pm,v 1.2 2001/04/11 16:00:20 wsnyder Exp $
+# $Revision: #5 $$Date: 2002/08/14 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -27,12 +27,12 @@ use IO::File;
 use Carp;
 
 use strict;
-use vars qw($VERSION $Global_Delayed @ISA @EXPORT);
+use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.400';
+$VERSION = '1.410';
 
 ######################################################################
 #### Traps
@@ -101,6 +101,7 @@ sub status {
 	my $msg = join('',@_);
 	$self->{status} = $msg;
 	$self->{errors}++ if $msg ne "Completed\n";
+	print "\tLog::Delayed::status <= $msg\n" if $Debug;
     }
     return $self->{status};
 }

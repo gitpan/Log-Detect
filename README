@@ -73,7 +73,7 @@ Supported Systems
 Installation
 ============
 
-  1. `cd' to the directory containing this INSTALL notice.
+  1. `cd' to the directory containing this README notice.
 
   2. Type `perl Makefile.PL' to configure Log::Detect for your system.
      (Note this package will probably run slower if you are still using

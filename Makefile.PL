@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.5 2001/05/21 13:51:39 wsnyder Exp $
+# $Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'perl Makefile.PL' to create a Makefile for this package
 
 require 5.005;
@@ -18,12 +18,18 @@ maintainer-dist: dist tag
 	mv \$(DISTVNAME).tar.gz \$(HOME)/backpack
 
 maintainer-clean: distclean
-	-rm README Makefile.PL vtrace
+	-rm README vtrace
 
 maintainer-copy: README
 
 tag:
-	cvs tag -F \$(DISTNAME)_\$(VERSION_SYM) .
+	p4 label -d     \$(DISTNAME)_\$(VERSION_SYM) || true
+	p4 label        \$(DISTNAME)_\$(VERSION_SYM)
+	p4 labelsync -l \$(DISTNAME)_\$(VERSION_SYM) ...
+#	cvs tag -F \$(DISTNAME)_\$(VERSION_SYM) .
+
+clean::
+	-rm -rf test_dir
 ";
 }
 

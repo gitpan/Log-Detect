@@ -1,7 +1,9 @@
 #!/usr/local/bin/perl -w
+# $Revision: #6 $$Date: 2002/08/14 $$Author: wsnyder $
 #DESCRIPTION: Perl ExtUtils: Common routines required by package tests
 
 use vars qw($PERL);
+use IO::File;
 
 $PERL = "$^X -Iblib/arch -Iblib/lib";
 

@@ -1,5 +1,5 @@
 # Log::Detect - Detect errors in logfiles
-# $Id: Detect.pm,v 1.3 2001/04/17 17:03:51 wsnyder Exp $
+# $Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -31,7 +31,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.400';
+$VERSION = '1.410';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -45,9 +45,10 @@ $VERSION = '1.400';
       [
        # Action => qr/REGEXP/,
        warning => qr/Stopping due to warnings/i,  # Actually a warning, not error, so first
-       error   => qr/(?i)%E|\bError ?[:!-]|Fatal ?[:!-]|\] Error [0-9]/,
+       error   => qr/(?i)%E|\bError ?[:!-\#]|Fatal ?[:!-]|\] Error [0-9]/,
+       error   => qr!aborted due to compilation errors!,	# Perl
        warning => qr/%W/i,
-       warning => qr/\bWarning ?[:!-]/i,
+       warning => qr/\bWarning ?[:!-\#]/i,
        finish  => qr/\*-\* All Finished \*-\*/,
        ],
       );
@@ -120,6 +121,11 @@ sub read {
 sub actions {
     my $self = shift;
     return @{$self->{_lines}};
+}
+
+sub filename {
+    $_[0]->{filename} = $_[1]  if ($#_ > 0);
+    return $_[0]->{filename};
 }
 
 sub actions_sorted_line {
@@ -213,7 +219,7 @@ sub write_dino {
 
     print $fh "# Dinotrace\n";
     print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Id: Detect.pm,v 1.3 2001/04/17 17:03:51 wsnyder Exp $ ', "\n";
+    print $fh '$Revision: #8 $$Date: 2002/08/14 $$Author: wsnyder $ ', "\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
