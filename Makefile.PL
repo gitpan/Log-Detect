@@ -1,4 +1,4 @@
-# $Revision: #9 $$Date: 2002/08/22 $$Author: wsnyder $
+# $Revision: #10 $$Date: 2003/08/12 $$Author: wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'perl Makefile.PL' to create a Makefile for this package
 
 require 5.005;
@@ -40,6 +40,9 @@ WriteMakefile(
 	      AUTHOR	=> 'Wilson Snyder <wsnyder@wsnyder.org>',
 	      ABSTRACT  => 'Parse logfiles to detect errors',
 	      EXE_FILES => [qw(vtrace)],
+	      PREREQ_PM => {'IO::Zlib' => 1.01,
+			    'Compress::Zlib' => 1.16,	# Needed by IO::Zlib, but I hate deps under deps!
+			},
 	      'dist'    => {COMPRESS => 'gzip -9f',
 			    SUFFIX   => '.gz', 
 			    DIST_DEFAULT => 'README all tardist',

@@ -1,5 +1,5 @@
 # Log::Delayed - Delayed error handling
-# $Revision: #3 $$Date: 2002/08/30 $$Author: wsnyder $
+# $Revision: #6 $$Date: 2003/09/04 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -30,7 +30,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.412';
+$VERSION = '1.413';
 
 ######################################################################
 #### Traps
@@ -48,17 +48,20 @@ sub new {
     my $class = shift;
     my $self = {errors => 0,
 		filename => ".status",
-		status => "Completed\n",
+		status => "Completed\n",	# Set to undef if will call completed() later.
+		overwrite => 1,
 		global => 1,
 		@_};
     bless $self, $class;
+    $self->{status} = "%Error: Missing Completed\n" if !defined $self->{status};
+    $self->{_noerror_status} = $self->{status};
     if ($self->{global}) {
 	$Global_Delayed = $self;
 	$SIG{__DIE__} = \&sig_die;
     }
     # Remove the file before we start; in case of a fatal error we don't
     # want a bad "Completed" message in it.
-    unlink $self->{filename} if ($self->{filename} && -r $self->{filename});
+    unlink $self->{filename} if ($self->{overwrite} && $self->{filename} && -r $self->{filename});
     return $self;
 }
 
@@ -82,12 +85,25 @@ sub sig_die {
 ######################################################################
 #### Accessors
 
+sub completed {
+    my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
+    my $msg = "Completed\n";
+    if ($#_ >= 0) {
+	$msg = join('',@_);
+    }
+    if (!$self->errors) {
+	$self->{status} = $msg;
+	$self->{_noerror_status} = $self->{status};
+	print "\tLog::Delayed::completed <= $msg\n" if $Debug;
+    }
+}
+
 sub errors {
     my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
     if ($#_ >= 0) {
 	$self->{errors} = shift;
-	if (!$self->{errors}) {
-	    $self->{status} = "Completed\n";
+	if (!$self->{errors}) {  # User cleared errors, so clear status too...
+	    $self->{status} = $self->{_noerror_status};
 	}
     }
     return $self->{errors};
@@ -95,10 +111,12 @@ sub errors {
 
 sub status {
     my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
+    # New apps should use errors(0) to clear errors, completed() to indicate completion
+    # or die_delayed() to report errors instead of this function
     if ($#_ >= 0) {
 	my $msg = join('',@_);
 	$self->{status} = $msg;
-	$self->{errors}++ if $msg ne "Completed\n";
+	$self->{errors}++ if $msg ne "Completed\n";	# Back compatible, suggest completed instead for new apps.
 	print "\tLog::Delayed::status <= $msg\n" if $Debug;
     }
     return $self->{status};
@@ -130,9 +148,12 @@ sub write_status {
     my $filename = $params{filename};
     defined $filename or croak "%Error: No filename=> specified, stopped";
 
-    my $fh = new IO::File (">$filename") or die "%Error: $! $filename\n";
-    print $fh $self->{status};
-    $fh->close();
+    print "\tLog::Delayed::write_status\n" if $Debug;
+    if ($params{overwrite} || (!-r $filename && $self->errors)) {
+	my $fh = new IO::File (">$filename") or die "%Error: $! $filename\n";
+	print $fh $params{status};
+	$fh->close();
+    }
 }
 
 sub read_status {
@@ -196,21 +217,43 @@ passed more useful tracking information then just the shell exit status.
 =item $dly->new
 
 New creates a new Log::Delayed object.  Parameters are passed by named
-form.  The filename=> parameter specifies the file to be written with the
-exit message, undef for none; defaults to .status.  The global=> parameter
-forces the $dly->sig_end to be called automatically at program exit, it
-defaults true.
+form.  
+
+The filename=> parameter specifies the file to be written with the exit
+message, undef for none; defaults to .status.
+
+The global=> boolean parameter forces the $dly->sig_end to be called
+automatically at program exit, it defaults true.
+
+The overwrite=> boolean parameter defaults to true to overwrite any
+existing status file and write it even if there are no errors.  If
+overwrite=> is clear, the status file will only be written with errors,
+which is useful to detect the first error across many applications running
+together.
+
+The status=> string has the default status.  It defaults to "Completed" for
+backward compatibility; new applications may wish to undef it and use the
+completed() call instead.
+
+=item $dly->completed
+
+Call at the end of the normal execution flow to set the status to
+"Completed\n".  Use with the status=>undef parameter in the new call.  This
+allows the status file to indicate if the program didn't complete normally,
+but also didn't report an error.  (Like from calling exit() insead of
+die().)
 
 =item $dly->die_delayed
 
 Die_delayed prints any parameters on stderr, then records the error
-occurrence for later error exiting.  If new was called with auto=>1 the
-exported version of die_delayed may be called without any object.
+occurrence for later error exiting.  If new was called with global=>1
+parameter, the exported version of die_delayed may be called without any
+object.
 
 =item $dly->errors
 
-errors returns the number of errors seen.  With a parameter it sets the
-number of errors seen.
+Returns the number of errors seen.  With a parameter it sets the number of
+errors seen.
 
 =item $dly->exit_if_error
 

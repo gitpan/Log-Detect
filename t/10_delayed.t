@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# $Revision: #3 $$Date: 2002/07/16 $$Author: wsnyder $
+# $Revision: #4 $$Date: 2002/09/26 $$Author: wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 
 use strict;
@@ -10,6 +10,8 @@ BEGIN { require "t/test_utils.pl"; }
 
 use Log::Delayed;
 ok(1);
+
+unlink("test_dir/.status");
 
 my $Delayed = new Log::Delayed (filename=>"test_dir/.status");
 ok(1);

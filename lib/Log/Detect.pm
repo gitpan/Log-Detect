@@ -1,5 +1,5 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #3 $$Date: 2002/08/30 $$Author: wsnyder $
+# $Revision: #7 $$Date: 2003/09/04 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -22,6 +22,7 @@
 package Log::Detect;
 use Text::Wrap;
 use IO::File;
+use IO::Zlib;
 use Class::Struct;
 use Carp;
 
@@ -29,7 +30,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.412';
+$VERSION = '1.413';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -74,6 +75,9 @@ sub set {
 
 sub add_regexp {
     my $self = shift;
+    my $numargs = $#_+1;
+    return if ($numargs <= 0);
+    confess("%Error:  Cannot call add_regexp() with an odd number of arguments ($numargs)!") if ($numargs % 2);
     unshift @{$self->{regexps}}, @_;
 }
 
@@ -91,8 +95,13 @@ sub read {
 
     my @regexps = @{$params{regexps}};
 
-    my $fh = new IO::File;
-    $fh->open ($filename) or die "%Error: $! $filename\n";
+    my $fh;
+    if ($filename =~ m/\.gz$/) {
+	$fh = IO::Zlib->new();
+    } else {
+	$fh = IO::File->new();
+    }
+    $fh->open($filename, "r") or die "%Error: $! $filename\n";
   line:
     while (my $line = $fh->getline()) {
 	next if ($line =~ /^\s*$/m);	# Short circuit
@@ -217,7 +226,7 @@ sub write_dino {
 
     print $fh "# Dinotrace\n";
     print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Revision: #3 $$Date: 2002/08/30 $$Author: wsnyder $ ', "\n";
+    print $fh '$Revision: #7 $$Date: 2003/09/04 $$Author: wsnyder $ ', "\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
@@ -329,8 +338,11 @@ For example, the default:
        ],
 
 Specifies that a line matching "stopping due to warnings" is a warning, as
-is %W.  A %E is a error.  As the rules are done in order, '%E stopping due
-to warnings' is actually a warning, not an error.
+is any line with %W (VMS's error messages).  A %E on a matching line is
+signalled as an error.  As the rules are done in order, if the file has the
+line '%E stopping due to warnings', which matches both the "%E" and the
+"stopping due to warnings" regexps, the first match wins, and thus the
+action indicates a warning, not an error.
 
 =back
 
@@ -393,7 +405,7 @@ were found in the logfile.
 
 =head1 SEE ALSO
 
-L<Log::Cell>
+L<Log::Delayed>
 
 =head1 DISTRIBUTION
 

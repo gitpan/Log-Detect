@@ -76,7 +76,9 @@ Installation
      (Note this package will probably run slower if you are still using
      perl 5.005.)
 
-  3. Type `make' to compile Log::Detect.
+  3. Type `make' to compile Log::Detect.  Some non-GNU makes may give
+     errors about DIST_DEFAULT, if so you can simply remove that line
+     from Makefile.PL, and repeat the last two steps.
 
   4. Type `make test' to check the compilation.
 

@@ -6,6 +6,13 @@ The contributors that suggested a given feature is shown in [].
 	
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
+* Changes in Log::Detect 1.413 9/4/2003
+
+***	Added new(...overwrite=>0) flag so .status can be kept
+across many parallel processes.
+	
+***	Added completed() method, and setting status=>undef in new.
+
 * Changes in Log::Detect 1.412 8/29/2002
 
 ****	Readme updates

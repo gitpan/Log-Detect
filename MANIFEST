@@ -1,7 +1,5 @@
 .cvsignore
 COPYING
-lib/Log/Delayed.pm
-lib/Log/Detect.pm
 MANIFEST
 Makefile.PL
 NEWS
@@ -9,7 +7,10 @@ README
 example/test.dino
 example/test.log
 example/vtrace.log_out
+lib/Log/Delayed.pm
+lib/Log/Detect.pm
 t/10_delayed.t
+t/11_delayed2.t
 t/20_detect.t
 t/30_vtrace.t
 t/test_utils.pl
