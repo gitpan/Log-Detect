@@ -1,22 +1,17 @@
 # Log::Delayed - Delayed error handling
-# $Revision: #6 $$Date: 2003/09/04 $$Author: wsnyder $
+# $Revision: #9 $$Date: 2004/01/27 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# This program is Copyright 2000 by Wilson Snyder.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of either the GNU General Public License or the
-# Perl Artistic License.
+# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# you can redistribute it and/or modify it under the terms of either the GNU
+# General Public License or the Perl Artistic License.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# If you do not have a copy of the GNU General Public License write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
-# MA 02139, USA.
 ######################################################################
 
 package Log::Delayed;
@@ -30,7 +25,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.413';
+$VERSION = '1.414';
 
 ######################################################################
 #### Traps
@@ -240,7 +235,7 @@ completed() call instead.
 Call at the end of the normal execution flow to set the status to
 "Completed\n".  Use with the status=>undef parameter in the new call.  This
 allows the status file to indicate if the program didn't complete normally,
-but also didn't report an error.  (Like from calling exit() insead of
+but also didn't report an error.  (Like from calling exit() instead of
 die().)
 
 =item $dly->die_delayed
@@ -273,7 +268,7 @@ END{} handler if global=>1 was specified with the new constructor.
 =item $dly->sig_die
 
 sig_die records the first error it sees so that write_status will contain
-perl related error messages.  sig_end is called automatically by the
+Perl related error messages.  sig_end is called automatically by the
 %SIG{__DIE__} handler if global=>1 was specified with the new constructor.
 
 =item $dly->write_status

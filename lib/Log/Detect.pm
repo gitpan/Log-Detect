@@ -1,22 +1,17 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #7 $$Date: 2003/09/04 $$Author: wsnyder $
+# $Revision: #10 $$Date: 2004/01/27 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# This program is Copyright 2000 by Wilson Snyder.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of either the GNU General Public License or the
-# Perl Artistic License.
+# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# you can redistribute it and/or modify it under the terms of either the GNU
+# General Public License or the Perl Artistic License.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# If you do not have a copy of the GNU General Public License write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
-# MA 02139, USA.
 ######################################################################
 
 package Log::Detect;
@@ -30,7 +25,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.413';
+$VERSION = '1.414';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -226,7 +221,7 @@ sub write_dino {
 
     print $fh "# Dinotrace\n";
     print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Revision: #7 $$Date: 2003/09/04 $$Author: wsnyder $ ', "\n";
+    print $fh '$Revision: #10 $$Date: 2004/01/27 $$Author: wsnyder $ ', "\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
@@ -339,7 +334,7 @@ For example, the default:
 
 Specifies that a line matching "stopping due to warnings" is a warning, as
 is any line with %W (VMS's error messages).  A %E on a matching line is
-signalled as an error.  As the rules are done in order, if the file has the
+signaled as an error.  As the rules are done in order, if the file has the
 line '%E stopping due to warnings', which matches both the "%E" and the
 "stopping due to warnings" regexps, the first match wins, and thus the
 action indicates a warning, not an error.
@@ -393,7 +388,7 @@ errors or warnings that were found.
 
 =item $det->write_dino
 
-write_dino prints to a file dinotrace annotations for any errors or
+write_dino prints to a file Dinotrace annotations for any errors or
 warnings that were found in the logfile.
 
 =item $det->write_stderr
