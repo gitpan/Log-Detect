@@ -1,5 +1,5 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #2 $$Date: 2002/08/22 $$Author: wsnyder $
+# $Revision: #3 $$Date: 2002/08/30 $$Author: wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -7,9 +7,7 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of either the GNU General Public License or the
-# Perl Artistic License, with the exception that it cannot be placed
-# on a CD-ROM or similar media for commercial distribution without the
-# prior approval of the author.
+# Perl Artistic License.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +29,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.411';
+$VERSION = '1.412';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -219,7 +217,7 @@ sub write_dino {
 
     print $fh "# Dinotrace\n";
     print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Revision: #2 $$Date: 2002/08/22 $$Author: wsnyder $ ', "\n";
+    print $fh '$Revision: #3 $$Date: 2002/08/30 $$Author: wsnyder $ ', "\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";

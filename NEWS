@@ -6,12 +6,14 @@ The contributors that suggested a given feature is shown in [].
 	
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
+* Changes in Log::Detect 1.412 8/29/2002
+
+****	Readme updates
+
 * Changes in Log::Detect 1.411 8/22/2002
 
 ****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
 
-----------------------------------------------------------------------
-$Id: //depot/hw/main/utils/perltools/Log-Detect/NEWS#1 $
 ----------------------------------------------------------------------
 Copyright information:
 

@@ -1,15 +1,13 @@
 #!/usr/local/bin/perl
 #=============================================================================
-# $Revision: #6 $$Date: 2002/07/16 $$Author: wsnyder $
+# $Revision: #7 $$Date: 2002/08/30 $$Author: wsnyder $
 #=============================================================================
 #
 # This program creates a define group file for waves
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of either the GNU General Public License or the
-# Perl Artistic License, with the exception that it cannot be placed
-# on a CD-ROM or similar media for commercial distribution without the
-# prior approval of the author.
+# Perl Artistic License.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -90,7 +88,7 @@ exit(defined $stat?10:0);
 #----------------------------------------------------------------------
 
 sub usage {
-    print '$Revision: #6 $$Date: 2002/07/16 $$Author: wsnyder $ ', "\n";
+    print '$Revision: #7 $$Date: 2002/08/30 $$Author: wsnyder $ ', "\n";
     $SIG{__WARN__} = sub{};	#pod2text isn't clean.
     pod2text($0);
     exit (1);
