@@ -1,4 +1,4 @@
-# $Revision: #12 $$Date: 2004/01/27 $$Author: wsnyder $
+# $Revision: #15 $$Date: 2004/08/26 $$Author: ws150726 $
 # DESCRIPTION: Perl ExtUtils: Type 'perl Makefile.PL' to create a Makefile for this package
 #
 # Copyright 2001-2004 by Wilson Snyder.  This program is free software;
@@ -17,20 +17,27 @@ README: readme.texi
 	-rm \$@
 	makeinfo \$< --output \$@ --no-headers --no-validate
 
-maintainer-dist: dist tag
+## Maintainer use:
+preexist:
+	test ! -r \$(HOME)/src/kits/\$(DISTVNAME).tar.gz
+
+tag:
+	c4 label -d     \$(DISTNAME)_\$(VERSION_SYM) || true
+	c4 label        \$(DISTNAME)_\$(VERSION_SYM)
+	c4 labelsync -l \$(DISTNAME)_\$(VERSION_SYM) ...
+#	cvs tag -F      \$(DISTNAME)_\$(VERSION_SYM) .
+
+maintainer-diff:
+	c4 diff     ...@\$(DISTNAME)_\$(VERSION_SYM) 
+
+maintainer-dist: preexist dist tag
 	cp \$(DISTVNAME).tar.gz \$(HOME)/src/kits
 	mv \$(DISTVNAME).tar.gz \$(HOME)/backpack
 
 maintainer-clean: distclean
-	-rm README vtrace
+	-rm README
 
 maintainer-copy: README
-
-tag:
-	p4 label -d     \$(DISTNAME)_\$(VERSION_SYM) || true
-	p4 label        \$(DISTNAME)_\$(VERSION_SYM)
-	p4 labelsync -l \$(DISTNAME)_\$(VERSION_SYM) ...
-#	cvs tag -F \$(DISTNAME)_\$(VERSION_SYM) .
 
 clean::
 	-rm -rf test_dir

@@ -1,5 +1,5 @@
 # Log::Delayed - Delayed error handling
-# $Revision: #9 $$Date: 2004/01/27 $$Author: wsnyder $
+# $Revision: #12 $$Date: 2004/10/26 $$Author: ws150726 $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -25,7 +25,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.414';
+$VERSION = '1.415';
 
 ######################################################################
 #### Traps
@@ -279,16 +279,20 @@ errors.
 
 =back
 
-=head1 SEE ALSO
-
-L<Log::Detect>, SIG{__DIE__} in L<perlvar>
-
 =head1 DISTRIBUTION
 
-The latest version is available from CPAN and from C<http://veripool.com/>.
+The latest version is available from CPAN and from L<http://www.veripool.com/>.
+
+Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License or the Perl Artistic License.
 
 =head1 AUTHORS
 
 Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Log::Detect>, C<SIG{__DIE__}> in L<perlvar>
 
 =cut

@@ -1,6 +1,6 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl -w
 #=============================================================================
-# $Revision: #11 $$Date: 2004/01/27 $$Author: wsnyder $
+# $Revision: #15 $$Date: 2004/10/26 $$Author: ws150726 $
 #=============================================================================
 #
 # This program creates a define group file for waves
@@ -89,7 +89,7 @@ exit(defined $stat?10:0);
 #----------------------------------------------------------------------
 
 sub usage {
-    print '$Revision: #11 $$Date: 2004/01/27 $$Author: wsnyder $ ', "\n";
+    print '$Revision: #15 $$Date: 2004/10/26 $$Author: ws150726 $ ', "\n";
     $SIG{__WARN__} = sub{};	#pod2text isn't clean.
     pod2text($0);
     exit (1);
@@ -116,7 +116,7 @@ vtrace - read log files to check for errors and create Dinotrace cursors
 
 =head1 SYNOPSIS
 
-C<vtrace> I<filename.log[.gz]>
+  vtrace <filename.log[.gz]>
 
 =head1 DESCRIPTION
 
@@ -157,21 +157,20 @@ is missing.
 
 =back
 
-=head1 EXAMPLES
-
-C<vtrace -stderr vcs.log>
-
 =head1 DISTRIBUTION
 
-The latest version is available from
-C<http://veripool.com/vtrace.html>.
+The latest version is available from CPAN and from L<http://www.veripool.com/vtrace.html>.
 
-=head1 SEE ALSO
-
-C<Log::Detect>
+Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License or the Perl Artistic License.
 
 =head1 AUTHORS
 
 Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Log::Detect>
 
 =cut

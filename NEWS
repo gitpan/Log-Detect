@@ -6,6 +6,10 @@ The contributors that suggested a given feature is shown in [].
 	
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
+* Changes in Log::Detect 1.415 10/26/2004
+
+****	Remove date-stamp from generated files, to aid object caching.
+
 * Changes in Log::Detect 1.414 1/27/2004
 
 ****	Documentation fixes

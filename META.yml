@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Log-Detect
+version:      1.415
+version_from: lib/Log/Detect.pm
+installdirs:  site
+requires:
+    Compress::Zlib:                1.16
+    IO::Zlib:                      1.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

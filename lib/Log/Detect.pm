@@ -1,5 +1,5 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #10 $$Date: 2004/01/27 $$Author: wsnyder $
+# $Revision: #14 $$Date: 2004/10/26 $$Author: ws150726 $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
@@ -25,7 +25,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.414';
+$VERSION = '1.415';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -55,8 +55,14 @@ sub new {
     my $self = {_lines => [],
 		%Default_Params};
     bless $self, $class;
+    $self->clear();
     $self->set (@_);
     return $self;
+}
+
+sub clear {
+    my $self = shift;
+    $self->{_lines} = [];
 }
 
 sub set {
@@ -220,8 +226,7 @@ sub write_dino {
     my $fh = IO::File->new (">$filename") or croak "%Error: $! $filename\n";
 
     print $fh "# Dinotrace\n";
-    print $fh "# Created automagically on ", (scalar(localtime)), " by ";
-    print $fh '$Revision: #10 $$Date: 2004/01/27 $$Author: wsnyder $ ', "\n";
+    print $fh "# Created automagically by Log::Detect\n";
 
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
@@ -361,6 +366,10 @@ Returns the parsed actions, sorted by line number.
 
 Prepends new rules to the regexp list.
 
+=item $det->clear
+
+Clears the list of parsed actions, as if a read had never occurred.
+
 =item $det->new
 
 Constructs the class.  Any variables described above may be passed to the
@@ -398,16 +407,20 @@ were found in the logfile.
 
 =back
 
-=head1 SEE ALSO
-
-L<Log::Delayed>
-
 =head1 DISTRIBUTION
 
-The latest version is available from CPAN and from C<http://veripool.com/>.
+The latest version is available from CPAN and from L<http://www.veripool.com/>.
+
+Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License or the Perl Artistic License.
 
 =head1 AUTHORS
 
 Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Log::Delayed>, L<vtrace>
 
 =cut
