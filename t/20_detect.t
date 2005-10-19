@@ -1,16 +1,16 @@
 #!/usr/bin/perl -w
-# $Revision: #6 $$Date: 2004/06/21 $$Author: ws150726 $
+# $Id: 20_detect.t 7637 2005-10-19 16:02:08Z wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
-# General Public License or the Perl Artistic License.
+# Lesser General Public License or the Perl Artistic License.
 
 use strict;
 use Test;
 use File::Copy;
 
-BEGIN { plan tests => 7 }
+BEGIN { plan tests => 9 }
 BEGIN { require "t/test_utils.pl"; }
 
 copy ("example/test.log","test_dir");
@@ -35,4 +35,9 @@ print "write_dino()\n";
 $d->write_dino(dino=>"test_dir/test.dino");
 ok(-r "test_dir/test.dino");
 ok(compare_files "example/test.dino", "test_dir/test.dino");
+
+print "write_simvision()\n";
+$d->write_simvision(simvision=>"test_dir/test.simvision");
+ok(-r "test_dir/test.simvision");
+ok(compare_files "example/test.simvision", "test_dir/test.simvision");
 

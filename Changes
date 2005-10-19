@@ -1,0 +1,48 @@
+Revision history for Perl extension Log::Detect.
+
+The contributors that suggested a given feature are shown in [].  [by ...]
+indicates the contributor was also the author of the fix; Thanks!
+
+* Log::Detect 1.420 2005/10/19
+
+**	NEWS is now renamed Changes, to support CPAN indexing. [Offer Kaye]
+
+***	Add vtrace support for simvision.
+
+* Log::Detect 1.415 2004/10/26
+
+****	Remove date-stamp from generated files, to aid object caching.
+
+* Log::Detect 1.414 2004/1/27
+
+****	Documentation fixes
+
+* Log::Detect 1.413 2003/9/4
+
+***	Added new(...overwrite=>0) flag so .status can be kept
+	across many parallel processes.
+	
+***	Added completed() method, and setting status=>undef in new.
+
+* Log::Detect 1.412 2002/8/29
+
+****	Readme updates
+
+* Log::Detect 1.411 2002/8/22
+
+****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
+
+----------------------------------------------------------------------
+$Id: Changes 7020 2005-10-05 15:52:08Z wsnyder $
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2001-2005 by Wilson Snyder.  This program is free software;
+you can redistribute it and/or modify it under the terms of either the GNU
+General Public License or the Perl Artistic License.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

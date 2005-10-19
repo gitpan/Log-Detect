@@ -1,9 +1,9 @@
 # Log::Delayed - Delayed error handling
-# $Revision: #12 $$Date: 2004/10/26 $$Author: ws150726 $
+# $Id: Delayed.pm 7628 2005-10-19 13:28:14Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,7 +25,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.415';
+$VERSION = '1.420';
 
 ######################################################################
 #### Traps
@@ -143,7 +143,7 @@ sub write_status {
     my $filename = $params{filename};
     defined $filename or croak "%Error: No filename=> specified, stopped";
 
-    print "\tLog::Delayed::write_status\n" if $Debug;
+    print "\tLog::Delayed::write_status, ".($self->errors||"ok")."\n" if $Debug;
     if ($params{overwrite} || (!-r $filename && $self->errors)) {
 	my $fh = new IO::File (">$filename") or die "%Error: $! $filename\n";
 	print $fh $params{status};
@@ -194,6 +194,8 @@ $Delayed->write_status();
 my $current_status = $Delayed->read_status();
 
 $Delayed->exit_if_error();
+
+$Delayed->completed()
 
 =head1 DESCRIPTION
 
@@ -283,7 +285,7 @@ errors.
 
 The latest version is available from CPAN and from L<http://www.veripool.com/>.
 
-Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2005 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

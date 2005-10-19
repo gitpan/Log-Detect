@@ -1,44 +1,0 @@
-Log::Detect NEWS --  history of user-visible changes.
-Copyright (C) 2002-2004 Wilson Snyder.
-See the end for copying conditions.
-
-The contributors that suggested a given feature is shown in [].
-	
-This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
-
-* Changes in Log::Detect 1.415 10/26/2004
-
-****	Remove date-stamp from generated files, to aid object caching.
-
-* Changes in Log::Detect 1.414 1/27/2004
-
-****	Documentation fixes
-
-* Changes in Log::Detect 1.413 9/4/2003
-
-***	Added new(...overwrite=>0) flag so .status can be kept
-across many parallel processes.
-	
-***	Added completed() method, and setting status=>undef in new.
-
-* Changes in Log::Detect 1.412 8/29/2002
-
-****	Readme updates
-
-* Changes in Log::Detect 1.411 8/22/2002
-
-****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
-
-----------------------------------------------------------------------
-Copyright information:
-
-   Copyright 2001-2004 by Wilson Snyder.  This program is free software;
-   you can redistribute it and/or modify it under the terms of either the GNU
-   General Public License or the Perl Artistic License.
-
-   See the README file included with this file for licencing information.
-
-Local variables:
-mode: outline
-paragraph-separate: "[ 	]*$"
-end:

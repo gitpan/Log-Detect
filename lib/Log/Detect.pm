@@ -1,9 +1,9 @@
 # Log::Detect - Detect errors in logfiles
-# $Revision: #14 $$Date: 2004/10/26 $$Author: ws150726 $
+# $Id: Detect.pm 7638 2005-10-19 16:03:25Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,12 +25,13 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.415';
+$VERSION = '1.420';
 
 (my $prog = $0) =~ s/^.*\///;
 
 %Default_Params =
     ( dino => undef,
+      simvision => undef,
       program => $prog,
       time_regexp => qr/\[([0-9 ]+)\]/,	# Regexp to extract time in $1
       warn_fatal => 1,
@@ -241,12 +242,62 @@ sub write_dino {
 		     ||(($actref->action() eq 'warning') && $params{warning_color})
 		     );
 	print $fh "#$text\n";
-	$comment =~ s/\s+/ /g;
-	$comment = Text::Wrap::wrap ('','',$comment);
-	$comment =~ s/\n/\\n/g;	# Use \n for newlines
-	$comment =~ s/\"/\\\"/g;	# Quote the quotes
 	if ($time && $color) {
+	    $comment =~ s/\s+/ /g;
+	    $comment = Text::Wrap::wrap ('','',$comment);
+	    $comment =~ s/\n/\\n/g;	# Use \n for newlines
+	    $comment =~ s/\"/\\\"/g;	# Quote the quotes
 	    print $fh "cursor_add $time $color \"$comment\"\n";
+	}
+	print $fh "\n";
+    }
+    print $fh "\n";
+    $fh->close();
+}
+
+sub write_simvision {
+    my $self = shift;
+    my %passed_params = (@_);
+    my %params = (error_prefix   => "%E:",
+		  warning_prefix => "%W:",
+		  timescale => "",	# ns, etc to suffix time with
+		  %{$self},
+		  @_);
+
+    my $filename = $passed_params{filename} || $params{simvision};
+    defined $filename or croak "%Error: No filename=> specified, stopped";
+    my $fh = IO::File->new (">$filename") or croak "%Error: $! $filename\n";
+
+    print $fh "# Simvision Command Script\n";
+    print $fh "# Created automagically by Log::Detect\n";
+
+    print $fh "\n";
+    print $fh "# Error/Warning cursors\n";
+    # Add in reverse order so earlier messages overwrite later
+    my %dup;
+    foreach my $actref (reverse ($self->actions_sorted_line())) {
+	my $text = $actref->text;
+	chomp $text;
+	my $comment = $text;
+	$comment =~ /$params{time_regexp}/;
+	my $time = $1 || 0;
+	# We add a prefix, because simvision doesn't let us change the color.  Yuk.
+	my $prefix = ((  ($actref->action() eq 'error') && $params{error_prefix})
+		      ||(($actref->action() eq 'warning') && $params{warning_prefix})
+		      );
+	next if $dup{$time.$text};  $dup{$time.$text} = 1;
+	print $fh "#$text\n";
+	if ($time && $prefix) {
+	    $comment =~ s/[^a-zA-Z---0-9%!@^&*()+|;:,.<>?~]/ /g;	# Quote meta characters
+	    $comment =~ s/\s+/ /g;
+	    $comment =~ s/^\s+//;
+	    $comment =~ s/\s+$//;
+	    my $sv_marker = $prefix.$comment;
+	    my $sv_time = $time.$params{timescale};
+	    print $fh "if {[catch {marker new -name {$sv_marker} -time $sv_time}] != \"\"} {\n";
+	    print $fh "    marker set -using {$sv_marker} -time $sv_time\n";
+	    print $fh "}\n";
+
 	}
 	print $fh "\n";
     }
@@ -307,13 +358,18 @@ they are called.
 
 The default filename for write_dino.
 
+=item simvision
+
+The default filename for write_simvision.
+
 =item program
 
 The name of the program to prepend to error messages.  Defaults to $0.
 
 =item time_regexp
 
-A regexp where $1 returns the timestamp.  Used by write_dino only.
+A regexp where $1 returns the timestamp.  Used by write_dino and
+write_simvision only.
 
 =item warn_fatal
 
@@ -400,6 +456,11 @@ errors or warnings that were found.
 write_dino prints to a file Dinotrace annotations for any errors or
 warnings that were found in the logfile.
 
+=item $det->write_simvision
+
+write_simvision prints to a file Simvision annotations for any errors or
+warnings that were found in the logfile.
+
 =item $det->write_stderr
 
 write_stderr prints to the screen any errors or warnings that
@@ -411,7 +472,7 @@ were found in the logfile.
 
 The latest version is available from CPAN and from L<http://www.veripool.com/>.
 
-Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2005 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

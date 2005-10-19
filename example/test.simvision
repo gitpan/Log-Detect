@@ -1,0 +1,17 @@
+# Simvision Command Script
+# Created automagically by Log::Detect
+
+# Error/Warning cursors
+#*-* All Finished *-*
+
+#[10] Error: Error here!
+if {[catch {marker new -name {%E:10 Error: Error here!} -time 10ns}] != ""} {
+    marker set -using {%E:10 Error: Error here!} -time 10ns
+}
+
+#[5] %Warning: This is a warning
+if {[catch {marker new -name {%W:5 %Warning: This is a warning} -time 5ns}] != ""} {
+    marker set -using {%W:5 %Warning: This is a warning} -time 5ns
+}
+
+

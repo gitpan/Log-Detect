@@ -1,9 +1,9 @@
-# $Revision: #15 $$Date: 2004/08/26 $$Author: ws150726 $
+# $Id: Makefile.PL 7637 2005-10-19 16:02:08Z wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'perl Makefile.PL' to create a Makefile for this package
 #
-# Copyright 2001-2004 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
-# General Public License or the Perl Artistic License.
+# Lesser General Public License or the Perl Artistic License.
 
 require 5.005;
 use ExtUtils::MakeMaker;
@@ -14,7 +14,7 @@ sub MY::postamble {
 DIST_DEFAULT += manifest
 
 README: readme.texi
-	-rm \$@
+	-rm -rf \$@
 	makeinfo \$< --output \$@ --no-headers --no-validate
 
 ## Maintainer use:
@@ -22,20 +22,17 @@ preexist:
 	test ! -r \$(HOME)/src/kits/\$(DISTVNAME).tar.gz
 
 tag:
-	c4 label -d     \$(DISTNAME)_\$(VERSION_SYM) || true
-	c4 label        \$(DISTNAME)_\$(VERSION_SYM)
-	c4 labelsync -l \$(DISTNAME)_\$(VERSION_SYM) ...
-#	cvs tag -F      \$(DISTNAME)_\$(VERSION_SYM) .
+	svnorcvs tag  \$(DISTNAME)_\$(VERSION_SYM)
 
 maintainer-diff:
-	c4 diff     ...@\$(DISTNAME)_\$(VERSION_SYM) 
+	svnorcvs diff \$(DISTNAME)_\$(VERSION_SYM) 
 
 maintainer-dist: preexist dist tag
 	cp \$(DISTVNAME).tar.gz \$(HOME)/src/kits
 	mv \$(DISTVNAME).tar.gz \$(HOME)/backpack
 
 maintainer-clean: distclean
-	-rm README
+	-rm -rf README
 
 maintainer-copy: README
 
@@ -53,6 +50,7 @@ WriteMakefile(
 	      EXE_FILES => [qw(vtrace)],
 	      PREREQ_PM => {'IO::Zlib' => 1.01,
 			    'Compress::Zlib' => 1.16,	# Needed by IO::Zlib, but I hate deps under deps!
+			    'Text::Wrap' => 0,
 			},
 	      'dist'    => {COMPRESS => 'gzip -9f',
 			    SUFFIX   => '.gz', 

@@ -1,22 +1,20 @@
 #!/usr/bin/perl -w
 #=============================================================================
-# $Revision: #15 $$Date: 2004/10/26 $$Author: ws150726 $
+# $Id: vtrace 7637 2005-10-19 16:02:08Z wsnyder $
 #=============================================================================
 #
 # This program creates a define group file for waves
 # 
-# Copyright 2000-2004 by Wilson Snyder.  This program is free software;
+# Copyright 2000-2005 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
-# General Public License or the Perl Artistic License.
+# Lesser General Public License or the Perl Artistic License.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# You should have received a copy of the Perl Artistic License
-# along with this module; see the file COPYING.  If not, see
-# www.cpan.org
+#=============================================================================
 
 require 5.005;
 use Getopt::Long;
@@ -41,6 +39,7 @@ use vars qw($Debug @More_Warnings $Detect);
 
 $Detect = new Log::Detect
     (dino => undef,
+     simvision => undef,
      warn_fatal => 1,
      warn_finish => 1,
      );
@@ -60,6 +59,7 @@ if (!GetOptions (
 		 "warnfatal!"	=> sub {shift; $Detect->set(warn_fatal => shift);},
 		 "warnfinish!"	=> sub {shift; $Detect->set(warn_finish => shift);},
 		 "dino=s"	=> sub {shift; $Detect->set(dino => shift);},
+		 "simvision=s"	=> sub {shift; $Detect->set(simvision => shift);},
 		 "result=s"	=> \$result_filename,
 		 "<>"		=> \&parameter,
 		 )) {
@@ -76,6 +76,7 @@ foreach my $file (@files) {
 $Detect->write_append () if ($opt_append);
 $Detect->write_stderr () if ($opt_stderr);
 $Detect->write_dino () if $Detect->{dino};
+$Detect->write_simvision () if $Detect->{simvision};
 
 my ($stat,$sum) = $Detect->summary();
 if ($result_filename) {
@@ -89,7 +90,7 @@ exit(defined $stat?10:0);
 #----------------------------------------------------------------------
 
 sub usage {
-    print '$Revision: #15 $$Date: 2004/10/26 $$Author: ws150726 $ ', "\n";
+    print '$Id: vtrace 7637 2005-10-19 16:02:08Z wsnyder $ ', "\n";
     $SIG{__WARN__} = sub{};	#pod2text isn't clean.
     pod2text($0);
     exit (1);
@@ -120,9 +121,10 @@ vtrace - read log files to check for errors and create Dinotrace cursors
 
 =head1 DESCRIPTION
 
-Vtrace reads the log files requested and optionally creates a Dinotrace
-file that places cursors at appropriate error or warning points.  The exit
-status will tell if any error or warnings were encountered in the file.
+Vtrace reads the log files requested and optionally creates a Dinotrace or
+Simvision file that places cursors at appropriate error or warning points.
+The exit status will tell if any error or warnings were encountered in the
+file.
 
 =head1 ARGUMENTS
 
@@ -142,6 +144,10 @@ Appends warning and error summary to end of the log file.
 
 Filename to write a Dinotrace config file to.
 
+=item --simvision I<name>
+
+Filename to write a Simvision config file to.
+
 =item --stderr
 
 Shows errors and warnings in the log file onto stderr.
@@ -159,9 +165,9 @@ is missing.
 
 =head1 DISTRIBUTION
 
-The latest version is available from CPAN and from L<http://www.veripool.com/vtrace.html>.
+The latest version is available from CPAN and from L<http://www.veripool.com/>.
 
-Copyright 2000-2004 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2005 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

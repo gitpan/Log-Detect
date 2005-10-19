@@ -1,15 +1,16 @@
 .cvsignore
+Changes
 COPYING
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
-Makefile.PL
-NEWS
-README
 example/test.dino
 example/test.log
+example/test.simvision
 example/vtrace.log_out
 lib/Log/Delayed.pm
 lib/Log/Detect.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
 t/00_pod.t
 t/10_delayed.t
 t/11_delayed2.t
