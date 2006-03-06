@@ -1,9 +1,9 @@
 # Log::Delayed - Delayed error handling
-# $Id: Delayed.pm 7628 2005-10-19 13:28:14Z wsnyder $
+# $Id: Delayed.pm 15289 2006-03-06 15:45:36Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2006 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,7 +25,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.420';
+$VERSION = '1.421';
 
 ######################################################################
 #### Traps
@@ -48,7 +48,7 @@ sub new {
 		global => 1,
 		@_};
     bless $self, $class;
-    $self->{status} = "%Error: Missing Completed\n" if !defined $self->{status};
+    $self->{status} = "%Error: Missing All Finished\n" if !defined $self->{status};
     $self->{_noerror_status} = $self->{status};
     if ($self->{global}) {
 	$Global_Delayed = $self;
@@ -285,7 +285,7 @@ errors.
 
 The latest version is available from CPAN and from L<http://www.veripool.com/>.
 
-Copyright 2000-2005 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2006 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

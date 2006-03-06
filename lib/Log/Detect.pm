@@ -1,9 +1,9 @@
 # Log::Detect - Detect errors in logfiles
-# $Id: Detect.pm 7638 2005-10-19 16:03:25Z wsnyder $
+# $Id: Detect.pm 15289 2006-03-06 15:45:36Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2005 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2006 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,7 +25,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.420';
+$VERSION = '1.421';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -36,6 +36,7 @@ $VERSION = '1.420';
       time_regexp => qr/\[([0-9 ]+)\]/,	# Regexp to extract time in $1
       warn_fatal => 1,
       warn_finish => 0,
+      report_limit => 0,
       regexps =>
       [
        # Action => qr/REGEXP/,
@@ -145,6 +146,28 @@ sub actions_sorted_line {
     #        @{$self->{_lines}});
 }
 
+sub actions_sorted_limited {
+    my $self = shift;
+    if (!$self->{report_limit} || $#{$self->{_lines}} <= $self->{report_limit}) {
+	return $self->actions_sorted_line;
+    }
+    my @lines;
+    foreach my $actref (@{$self->{_lines}}) {
+	if ($#lines == $self->{report_limit}) {
+	    my $line = $actref->text;
+	    $line =~ s/.*($self->{time_regexp}).*/$1/;
+	    $line =~ s/[\n\r]*//mg;
+	    $line .= " %Error: Additional warnings and errors were suppressed.";
+	    my $newref = [$actref->lineno, $actref->filename, $actref->action, $line];
+	    bless $newref, 'Log::Detect::Action';
+	    push @lines, $newref;
+	    last;
+	}
+	push @lines, $actref;
+    }
+    return @lines;
+}
+
 ######################################################################
 #### Result Functions
 
@@ -232,7 +255,7 @@ sub write_dino {
     print $fh "\n";
     print $fh "# Error/Warning cursors\n";
     # Add in reverse order so earlier messages overwrite later
-    foreach my $actref (reverse ($self->actions_sorted_line())) {
+    foreach my $actref (reverse ($self->actions_sorted_limited())) {
 	my $text = $actref->text;
 	chomp $text;
 	my $comment = $text;
@@ -275,7 +298,7 @@ sub write_simvision {
     print $fh "# Error/Warning cursors\n";
     # Add in reverse order so earlier messages overwrite later
     my %dup;
-    foreach my $actref (reverse ($self->actions_sorted_line())) {
+    foreach my $actref (reverse ($self->actions_sorted_limited())) {
 	my $text = $actref->text;
 	chomp $text;
 	my $comment = $text;
@@ -293,6 +316,8 @@ sub write_simvision {
 	    $comment =~ s/^\s+//;
 	    $comment =~ s/\s+$//;
 	    my $sv_marker = $prefix.$comment;
+	    # Always have a leading % sign, so we can recognize all automatic markers
+	    $sv_marker = "%".$sv_marker if $sv_marker !~ /^%/;
 	    my $sv_time = $time.$params{timescale};
 	    print $fh "if {[catch {marker new -name {$sv_marker} -time $sv_time}] != \"\"} {\n";
 	    print $fh "    marker set -using {$sv_marker} -time $sv_time\n";
@@ -418,6 +443,11 @@ itself.
 
 Returns the parsed actions, sorted by line number.
 
+=item $det->actions_sorted_limited
+
+Returns the parsed actions, sorted by line number.  Contains a maximum of
+report_limit number of errors.
+
 =item $det->add_regexp
 
 Prepends new rules to the regexp list.
@@ -472,7 +502,7 @@ were found in the logfile.
 
 The latest version is available from CPAN and from L<http://www.veripool.com/>.
 
-Copyright 2000-2005 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2006 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

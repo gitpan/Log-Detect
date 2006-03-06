@@ -5,13 +5,13 @@
 #*-* All Finished *-*
 
 #[10] Error: Error here!
-if {[catch {marker new -name {%E:10 Error: Error here!} -time 10ns}] != ""} {
-    marker set -using {%E:10 Error: Error here!} -time 10ns
+if {[catch {marker new -name {%E:10 Error: Error here!} -time 10}] != ""} {
+    marker set -using {%E:10 Error: Error here!} -time 10
 }
 
 #[5] %Warning: This is a warning
-if {[catch {marker new -name {%W:5 %Warning: This is a warning} -time 5ns}] != ""} {
-    marker set -using {%W:5 %Warning: This is a warning} -time 5ns
+if {[catch {marker new -name {%W:5 %Warning: This is a warning} -time 5}] != ""} {
+    marker set -using {%W:5 %Warning: This is a warning} -time 5
 }
 
 
