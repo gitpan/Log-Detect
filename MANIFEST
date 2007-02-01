@@ -12,6 +12,7 @@ MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
 README
 t/00_pod.t
+t/01_manifest.t
 t/10_delayed.t
 t/11_delayed2.t
 t/20_detect.t

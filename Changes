@@ -3,6 +3,10 @@ Revision history for Perl extension Log::Detect.
 The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
+* Log::Detect 1.422 2007/02/01
+
+****	Documentation updates.
+
 * Log::Detect 1.421 2006/03/06
 
 ****	Add report_limit to huge number of dinotrace cursors.  [Bryce Denney]
@@ -37,12 +41,13 @@ indicates the contributor was also the author of the fix; Thanks!
 ****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
 
 ----------------------------------------------------------------------
-$Id: Changes 15289 2006-03-06 15:45:36Z wsnyder $
+$Id: Changes 31182 2007-02-01 14:36:21Z wsnyder $
+DESCRIPTION: Documentation on change history for this package
 ----------------------------------------------------------------------
 
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
-Copyright 2001-2006 by Wilson Snyder.  This program is free software;
+Copyright 2001-2007 by Wilson Snyder.  This program is free software;
 you can redistribute it and/or modify it under the terms of either the GNU
 General Public License or the Perl Artistic License.
 

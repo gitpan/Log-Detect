@@ -1,9 +1,9 @@
 # Log::Detect - Detect errors in logfiles
-# $Id: Detect.pm 15289 2006-03-06 15:45:36Z wsnyder $
+# $Id: Detect.pm 31182 2007-02-01 14:36:21Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2006 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,7 +25,7 @@ use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.421';
+$VERSION = '1.422';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -500,9 +500,11 @@ were found in the logfile.
 
 =head1 DISTRIBUTION
 
-The latest version is available from CPAN and from L<http://www.veripool.com/>.
+Log-Detect is part of the L<http://www.veripool.com/> free EDA software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.com/>.
 
-Copyright 2000-2006 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2007 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

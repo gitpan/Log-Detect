@@ -1,9 +1,9 @@
 # Log::Delayed - Delayed error handling
-# $Id: Delayed.pm 15289 2006-03-06 15:45:36Z wsnyder $
+# $Id: Delayed.pm 31182 2007-02-01 14:36:21Z wsnyder $
 # Author: Wilson Snyder <wsnyder@wsnyder.org>
 ######################################################################
 #
-# Copyright 2001-2006 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # General Public License or the Perl Artistic License.
 # 
@@ -25,7 +25,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.421';
+$VERSION = '1.422';
 
 ######################################################################
 #### Traps
@@ -45,6 +45,7 @@ sub new {
 		filename => ".status",
 		status => "Completed\n",	# Set to undef if will call completed() later.
 		overwrite => 1,
+		write_if_ok => 1,
 		global => 1,
 		@_};
     bless $self, $class;
@@ -66,7 +67,7 @@ sub new {
 sub sig_end {
     my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
     $? = 10 if (!$? && $self->{errors});	# Exit with bad status if a error was detected
-    $self->write_status() if $self->{filename};
+    $self->write_status() if $self->{filename} && ($self->{write_if_ok} || $self->{errors});
 }
 
 sub sig_die {
@@ -79,6 +80,11 @@ sub sig_die {
 
 ######################################################################
 #### Accessors
+
+sub global_self {
+    my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
+    return $self;
+}
 
 sub completed {
     my $self = (ref $_[0]) ? shift : $Global_Delayed;  # Allow method or global calling
@@ -232,6 +238,11 @@ The status=> string has the default status.  It defaults to "Completed" for
 backward compatibility; new applications may wish to undef it and use the
 completed() call instead.
 
+The write_if_ok=> boolean parameter defaults to true to write the .status
+file if there are no errors to report on exit.  If cleared, ok status will
+not be written.  This is useful for forked processes that need to silently
+exit.
+
 =item $dly->completed
 
 Call at the end of the normal execution flow to set the status to
@@ -255,6 +266,11 @@ errors seen.
 =item $dly->exit_if_error
 
 exit_if_error exits the program if any errors were detected.
+
+=item $dly->global_self
+
+Returns the default object, either the one passed, or the default global
+object - the last one created.
 
 =item $dly->read_status
 
@@ -283,9 +299,11 @@ errors.
 
 =head1 DISTRIBUTION
 
-The latest version is available from CPAN and from L<http://www.veripool.com/>.
+Log-Detect is part of the L<http://www.veripool.com/> free EDA software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.com/>.
 
-Copyright 2000-2006 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2007 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
-# $Id: 20_detect.t 15289 2006-03-06 15:45:36Z wsnyder $
+# $Id: 20_detect.t 31182 2007-02-01 14:36:21Z wsnyder $
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2001-2006 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License or the Perl Artistic License.
 
