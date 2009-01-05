@@ -1,0 +1,3 @@
+Log::Detect match: test_dir/test.log:4: Causes actwarning due to blib/lib/Log/Detect.pm:36
+Log::Detect match: test_dir/test.log:6: Causes acterror due to blib/lib/Log/Detect.pm:34
+Log::Detect match: test_dir/test.log:10: Causes actfinish due to blib/lib/Log/Detect.pm:38

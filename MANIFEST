@@ -1,4 +1,4 @@
-.cvsignore
+.gitignore
 Changes
 COPYING
 example/test.dino
@@ -9,13 +9,16 @@ lib/Log/Delayed.pm
 lib/Log/Detect.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
 README
 t/00_pod.t
 t/01_manifest.t
 t/10_delayed.t
 t/11_delayed2.t
+t/20_act_dump.out
 t/20_detect.t
+t/25_spool.t
 t/30_vtrace.t
 t/test_utils.pl
 vtrace

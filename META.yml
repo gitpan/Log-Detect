@@ -1,13 +1,17 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Log-Detect
-version:      1.422
-version_from: lib/Log/Detect.pm
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                Log-Detect
+version:             1.423
+abstract:            Parse logfiles to detect errors
+license:             ~
+author:              
+    - Wilson Snyder <wsnyder@wsnyder.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
     Compress::Zlib:                1.16
     IO::Zlib:                      1.01
+    Pod::Usage:                    0
     Text::Wrap:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

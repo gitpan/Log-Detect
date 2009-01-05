@@ -1,7 +1,6 @@
-# $Id: test_utils.pl 31182 2007-02-01 14:36:21Z wsnyder $
 # DESCRIPTION: Perl ExtUtils: Common routines required by package tests
 #
-# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
+# Copyright 2001-2009 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License or the Perl Artistic License.
 
@@ -36,18 +35,19 @@ sub wholefile {
     return $wholefile;
 }
 
-sub compare_files {
-    my $filename1 = shift;
-    my $filename2 = shift;
-    # Ok, let's make sure the right data went through
-    my $f1 = wholefile ($filename1) or die;
-    my $f2 = wholefile ($filename2) or die;
-    my @l1 = split ("\n", $f1);
-    my @l2 = split ("\n", $f2);
-    for (my $l=0; $l<($#l1 | $#l2); $l++) {
-	next if $l1[$l] =~ /created auto/i;
-	if ($l1[$l] ne $l2[$l]) {
-	    warn "$filename1 != $filename2: Line $l mismatches\n$l1[$l]\n$l2[$l]\n";
+sub files_identical {
+    my $fn1 = shift;
+    my $fn2 = shift;
+    my $f1 = IO::File->new ($fn1) or die "%Error: $! $fn1,";
+    my $f2 = IO::File->new ($fn2) or die "%Error: $! $fn2,";
+    my @l1 = $f1->getlines();
+    my @l2 = $f2->getlines();
+    my $nl = $#l1;  $nl = $#l2 if ($#l2 > $nl);
+    for (my $l=0; $l<=$nl; $l++) {
+	if (($l1[$l]||"") ne ($l2[$l]||"")) {
+	    warn ("%Warning: Line ".($l+1)." mismatches; $fn1 != $fn2\n"
+		  ."F1: ".($l1[$l]||"*EOF*\n")
+		  ."F2: ".($l2[$l]||"*EOF*\n"));
 	    return 0;
 	}
     }

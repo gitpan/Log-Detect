@@ -3,6 +3,17 @@ Revision history for Perl extension Log::Detect.
 The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
+* Log::Detect 1.423 2008/01/05
+
+**	Log::Detect->new no longer takes a regexp parameter.  Use add_regexp.
+
+**	Add Log::Detect->parse_text for block-by-block parsing.
+
+****	Add Log::Detect->action_dump method. This prints where regexps which
+	matched were added to aid debugging regexp lists. [Bryce Denney]
+
+****	Fix --help to use Pod::Usage instead of depreciated pod2text.
+
 * Log::Detect 1.422 2007/02/01
 
 ****	Documentation updates.
@@ -29,7 +40,7 @@ indicates the contributor was also the author of the fix; Thanks!
 
 ***	Added new(...overwrite=>0) flag so .status can be kept
 	across many parallel processes.
-	
+
 ***	Added completed() method, and setting status=>undef in new.
 
 * Log::Detect 1.412 2002/8/29
@@ -41,13 +52,12 @@ indicates the contributor was also the author of the fix; Thanks!
 ****	Move files into lib directory to support perl 5.8.0. [Mike Castle]
 
 ----------------------------------------------------------------------
-$Id: Changes 31182 2007-02-01 14:36:21Z wsnyder $
 DESCRIPTION: Documentation on change history for this package
 ----------------------------------------------------------------------
 
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
-Copyright 2001-2007 by Wilson Snyder.  This program is free software;
+Copyright 2001-2009 by Wilson Snyder.  This program is free software;
 you can redistribute it and/or modify it under the terms of either the GNU
 General Public License or the Perl Artistic License.
 

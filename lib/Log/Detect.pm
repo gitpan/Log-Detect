@@ -1,31 +1,19 @@
 # Log::Detect - Detect errors in logfiles
-# $Id: Detect.pm 31182 2007-02-01 14:36:21Z wsnyder $
-# Author: Wilson Snyder <wsnyder@wsnyder.org>
-######################################################################
-#
-# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
-# you can redistribute it and/or modify it under the terms of either the GNU
-# General Public License or the Perl Artistic License.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
+# See copyright, etc in below POD section.
 ######################################################################
 
 package Log::Detect;
-use Text::Wrap;
+use Carp;
+use Class::Struct;
+use File::Basename;
 use IO::File;
 use IO::Zlib;
-use Class::Struct;
-use Carp;
+use Text::Wrap;
 
-use Log::Delayed;
 use strict;
 use vars qw($VERSION %Default_Params);
 
-$VERSION = '1.422';
+$VERSION = '1.423';
 
 (my $prog = $0) =~ s/^.*\///;
 
@@ -37,17 +25,18 @@ $VERSION = '1.422';
       warn_fatal => 1,
       warn_finish => 0,
       report_limit => 0,
-      regexps =>
-      [
-       # Action => qr/REGEXP/,
-       warning => qr/Stopping due to warnings/i,  # Actually a warning, not error, so first
-       error   => qr/(?i)%E|\bError ?[:!-\#]|Fatal ?[:!-]|\] Error [0-9]/,
-       error   => qr!aborted due to compilation errors!,	# Perl
-       warning => qr/%W/i,
-       warning => qr/\bWarning ?[:!-\#]/i,
-       finish  => qr/\*-\* All Finished \*-\*/,
-       ],
       );
+
+sub add_regexp_defaults {
+    my $self = shift;
+    #                 Action  => qr/REGEXP/,
+    $self->add_regexp(error   => qr!aborted due to compilation errors!);	# Perl
+    $self->add_regexp(error   => qr/(?i)%E|\bError ?[:!-\#]|Fatal ?[:!-]|\] Error [0-9]/);
+    $self->add_regexp(warning => qr/Stopping due to warnings/i);  # Actually a warning, not error, so first
+    $self->add_regexp(warning => qr/\bWarning ?[:!-\#]/i);
+    $self->add_regexp(warning => qr/%W/i);
+    $self->add_regexp(finish  => qr/\*-\* All Finished \*-\*/);
+}
 
 ######################################################################
 #### Creation
@@ -55,9 +44,17 @@ $VERSION = '1.422';
 sub new {
     my $class = shift;
     my $self = {_lines => [],
-		%Default_Params};
+		_regexps => [],
+		_compiled_err_regexps => undef,
+		_compiled_ign_regexps => undef,
+		_parse_filename => "",
+		_parse_lineno => 1,
+		_parse_remainder => "",
+		%Default_Params,
+		};  # No @_, that's handled with set(@_) below
     bless $self, $class;
     $self->clear();
+    $self->add_regexp_defaults();
     $self->set (@_);
     return $self;
 }
@@ -76,16 +73,127 @@ sub set {
     }
 }
 
+######################################################################
+#### Regexp handling
+
+sub clear_regexps {
+    my $self = shift;
+    $self->{_compiled_err_regexps} = undef;
+    $self->{_compiled_ign_regexps} = undef;
+    $self->{_regexps} = [];
+}
+
 sub add_regexp {
     my $self = shift;
-    my $numargs = $#_+1;
+    my @regexppairs = @_;
+    my $numargs = $#regexppairs + 1;
     return if ($numargs <= 0);
     confess("%Error:  Cannot call add_regexp() with an odd number of arguments ($numargs)!") if ($numargs % 2);
-    unshift @{$self->{regexps}}, @_;
+
+    $self->{_compiled_err_regexps} = undef;
+    $self->{_compiled_ign_regexps} = undef;
+
+    my ($pack, $filename, $lineno) = caller(0);
+
+    for (my $i=0; $i<=$#regexppairs; $i+=2) {
+	my $action = $regexppairs[$i];
+	my $re     = $regexppairs[$i+1];
+	my $regexpref = [$re, $action, $filename, $lineno];
+	if (!ref $re) { $re = qr/$re/; }   # Precompile it.
+	bless $regexpref, 'Log::Detect::Regexp';
+	push @{$self->{_regexps}}, $regexpref;
+    }
+}
+
+sub _compile_regexps {
+    my $self = shift;
+    # Given the list of regular expressions, split it into two parts,
+    # the ignores, which only need to be matched if something else is found
+    # and everything else.
+    # We only need to do this when the regexps change, so we cache the results.
+    return if $self->{_compiled_err_regexps};
+    # Sort by category
+    my %re_by_action;
+    foreach my $reref (@{$self->{_regexps}}) {
+	$re_by_action{$reref->action} ||= [];
+	push @{$re_by_action{$reref->action}}, $reref;
+    }
+    # Put categories into specific order
+    $self->{_compiled_ign_regexps} = [@{$re_by_action{ignore}||[]}];
+    $self->{_compiled_err_regexps} = [@{$re_by_action{error}||[]},
+				      @{$re_by_action{warning}||[]},
+				      @{$re_by_action{finish}||[]},];
+    foreach (qw(ignore error warning finish)) { delete $re_by_action{$_}; }
+    # Add any user defined categories
+    foreach my $action (keys %re_by_action) {
+	push @{$self->{_compiled_err_regexps}}, @{$re_by_action{$action}};
+    }
+    #use Data::Dumper; print Dumper($self->{_regexps});
+    #use Data::Dumper; print Dumper($self->{_compiled_err_regexps});
+    #use Data::Dumper; print Dumper($self->{_compiled_ign_regexps});
 }
 
 ######################################################################
-#### Reading Functions
+#### Block by block Reading Functions
+
+sub parse_start {
+    my $self = shift;
+    my %params = (#filename=>,
+		  lineno=>1,
+		  @_);
+    $params{filename} or croak "%Error: parse_start filename not specified,";
+    $self->{_parse_filename} = $params{filename};
+    $self->{_parse_lineno} = $params{lineno};
+    $self->{_parse_remainder} = "";
+
+    $self->_compile_regexps if !$self->{_compiled_err_regexps};
+}
+
+sub parse_text {
+    my $self = shift;
+  text:
+    foreach my $text (@_) {
+	my $line = $text;
+	$line = $self->{_parse_remainder}.$text if length $self->{_parse_remainder};
+	my $eol = index $line,"\n";
+	if ($eol<0) {
+	    # Remember, and keep going until we get our newline
+	    $self->{_parse_remainder} = $line;
+	} else {
+	    # All up to the newline is the line we pass, the rest is the remainder.
+	    $self->{_parse_remainder} = substr($line,$eol+1);
+	    $self->{_parse_lineno}++;
+	    $line = substr($line,0,$eol+1);
+	    # Finally a whole line!  Deal with it.
+	    next text if ($line =~ /^\s*$/m);	# Short circuit
+	    foreach my $reref (@{$self->{_compiled_err_regexps}}) {
+		my $re = $reref->[0];
+		if ($line =~ /$re/) {
+		    # Now we need to see if it's ignored.
+		    foreach my $ireref (@{$self->{_compiled_ign_regexps}}) {
+			my $ire = $ireref->[0];
+			next text if ($line =~ /$ire/);
+		    }
+		    #print "MATCH: ".$reref->action."  $line\n" if $Debug;
+		    my $actref = [$self->{_parse_lineno} - 1,   # We preincremented
+				  $self->{_parse_filename},
+				  $reref->action, $line, $reref];
+		    bless $actref, 'Log::Detect::Action';
+		    push @{$self->{_lines}}, $actref;
+		    next text;
+		}
+	    }
+	}
+    }
+}
+
+sub parse_eof {
+    my $self = shift;
+    $self->parse_text("\n");
+}
+
+######################################################################
+#### Whole File Reading Functions
 
 sub read {
     my $self = shift;
@@ -96,7 +204,11 @@ sub read {
     defined $filename or croak "%Error: No filename=> specified, stopped";
     $self->{filename} = $filename;
 
-    my @regexps = @{$params{regexps}};
+    $self->parse_start(filename=>$filename, lineno=>1);
+
+    # We're going to reference them a lot, so make them local
+    my @err_regexps = @{$self->{_compiled_err_regexps}};
+    my @ign_regexps = @{$self->{_compiled_ign_regexps}};
 
     my $fh;
     if ($filename =~ m/\.gz$/) {
@@ -107,14 +219,18 @@ sub read {
     $fh->open($filename, "r") or die "%Error: $! $filename\n";
   line:
     while (my $line = $fh->getline()) {
-	next if ($line =~ /^\s*$/m);	# Short circuit
-	for (my $i=0; $i<=$#regexps; $i+=2) {
-	    my $re = $regexps[$i+1];
+	# We could call $self->parse_text, but it's much faster to inline it.
+	next line if ($line =~ /^\s*$/m);	# Short circuit
+	foreach my $reref (@err_regexps) {
+	    my $re = $reref->[0];
 	    if ($line =~ /$re/) {
-		my $action = $regexps[$i]; 
-		next line if $action eq "ignore";
-		#print "MATCH: $action  $line\n" if $Debug;
-		my $actref = [$., $filename, $action, $line];
+		# Now we need to see if it's ignored
+		foreach my $ireref (@ign_regexps) {
+		    my $ire = $ireref->[0];
+		    next line if ($line =~ /$ire/);
+		}
+		#print "MATCH: ".$reref->action."  $line\n" if $Debug;
+		my $actref = [$., $filename, $reref->action, $line, $reref];
 		bless $actref, 'Log::Detect::Action';
 		push @{$self->{_lines}}, $actref;
 		next line;
@@ -122,6 +238,7 @@ sub read {
 	}
     }
     $fh->close;
+    $self->parse_eof;
     #use Data::Dumper; print Dumper($self);
 }
 
@@ -187,8 +304,6 @@ sub write_append {
     my $filename = $params{filename};
     defined $filename or croak "%Error: No filename=> specified, stopped";
 
-    my @regexps = @{$params{regexps}};
-
     my ($stat,$sum) = $self->summary();
     if (defined $sum) {
 	my $fh = new IO::File;
@@ -207,9 +322,9 @@ sub summary {
     my $first_warn;
     my $first_finish;
     foreach my $actref ($self->actions_sorted_line()) {
-	$first_error = $actref if (!$first_error && $actref->action() eq 'error');
-	$first_warn  = $actref if (!$first_warn && $actref->action() eq 'warning');
-	$first_finish = $actref if (!$first_finish && $actref->action() eq 'finish');
+	$first_error = $actref if (!$first_error && $actref->action eq 'error');
+	$first_warn  = $actref if (!$first_warn && $actref->action eq 'warning');
+	$first_finish = $actref if (!$first_finish && $actref->action eq 'finish');
 	if ($actref->action eq 'error' || $actref->action eq 'warning') {
 	    push @out, $actref->text;
 	}
@@ -234,6 +349,25 @@ sub summary {
 
     unshift @out, "\n".("-"x70)."\n";
     return ($result_message, (join '',@out));
+}
+
+sub actions_dump {
+    my $self = shift;
+    my %params = (#basename => undef,	# Take the basename of the filenames
+		  @_);
+    # Return textual summary of actions, for debugging
+    my @out = ();
+    foreach my $actref ($self->actions_sorted_line) {
+	# The act is here to make it not match the standalone word error
+	my $rfn = $actref->regexp->filename;
+	$rfn=File::Basename::basename($rfn) if $params{basename};
+	push @out, sprintf("Log::Detect match: %s:%d: Causes act%s due to %s:%d\n",
+			   $actref->filename, $actref->lineno,
+			   $actref->action,
+			   $rfn, $actref->regexp->lineno,
+			   );
+    }
+    return (wantarray ? @out : join('',@out));
 }
 
 sub write_dino {
@@ -341,6 +475,20 @@ struct('Log::Detect::Action'
 	  filename 	=> '$', #'	# Filename this came from
 	  action 	=> '$', #'	# Action decoded
 	  text		=> '$', #'	# Text on that line
+	  regexp	=> '$', #'	# Matching Log::Detect::Regexp reference
+	  ]);
+
+######################################################################
+######################################################################
+######################################################################
+#### Regexp class
+
+# Internal code (only) assumes the regexp is in [0]
+struct('Log::Detect::Regexp'
+       =>[regexp	=> '$', #'	# Reference to regular expression
+	  action 	=> '$', #'	# Action desired
+	  filename 	=> '$', #'	# Filename this came from
+	  lineno     	=> '$', #'	# Line number from
 	  ]);
 
 ######################################################################
@@ -404,27 +552,6 @@ If true, warnings are considered fatal errors.  Defaults true.
 
 If true, lack of a regexp matching 'finish' is considered fatal.
 
-=item regexps
-
-A list of actions and regular expressions.  The regexps are matched
-against the text in order, with the first match action determining
-the result.
-
-For example, the default:
-      [warning => qr/Stopping due to warnings/i,
-       error   => qr/(?i)%E|\bError ?[:!-]|Fatal ?[:!-]|\] Error [0-9]/,
-       warning => qr/%W/i,
-       warning => qr/\bWarning ?[:!-]/i,
-       finish  => qr/\*-\* All Finished \*-\*/,
-       ],
-
-Specifies that a line matching "stopping due to warnings" is a warning, as
-is any line with %W (VMS's error messages).  A %E on a matching line is
-signaled as an error.  As the rules are done in order, if the file has the
-line '%E stopping due to warnings', which matches both the "%E" and the
-"stopping due to warnings" regexps, the first match wins, and thus the
-action indicates a warning, not an error.
-
 =back
 
 =head1 FUNCTIONS
@@ -439,6 +566,10 @@ number the message was detected on.  filename is the file the error came
 from.  action is the action specified with the regexp.  text is the line
 itself.
 
+=item $det->actions_dump
+
+Return string summary of all matching actions.
+
 =item $det->actions_sorted_line
 
 Returns the parsed actions, sorted by line number.
@@ -452,23 +583,62 @@ report_limit number of errors.
 
 Prepends new rules to the regexp list.
 
+The regexps are matched against the text in order, with the first match
+action determining the result.
+
+For example, the default:
+      (warning => qr/Stopping due to warnings/i);
+      (error   => qr/(?i)%E|\bError ?[:!-]|Fatal ?[:!-]|\] Error [0-9]/);
+      (warning => qr/%W/i);
+      (warning => qr/\bWarning ?[:!-]/i);
+      (finish  => qr/\*-\* All Finished \*-\*/);
+
+Specifies that a line matching "stopping due to warnings" is a warning, as
+is any line with %W (VMS's error messages).  A %E on a matching line is
+signaled as an error.  As the rules are done in order, if the file has the
+line '%E stopping due to warnings', which matches both the "%E" and the
+"stopping due to warnings" regexps, the first match wins, and thus the
+action indicates a warning, not an error.
+
 =item $det->clear
 
 Clears the list of parsed actions, as if a read had never occurred.
+
+=item $det->clear_regexps
+
+Clears the list of regular expressions.
 
 =item $det->new
 
 Constructs the class.  Any variables described above may be passed to the
 constructor.
 
+=item $det->parse_eof
+
+Call when the current parse_text is complete, and any partially completed
+messages should be emptied out.
+
+=item $det->parse_text(I<text>...)
+
+Parse_text will check any parameters for error messages.  If complete lines
+are not given, the line is buffered until more arrives.
+
+You must call parse_start before the first call to this function, and must
+call parse_eof to avoid missing an error that is not newline terminated at
+the end of the file.
+
+=item $det->parse_start( filename=>, lineno=> )
+
+Called to indicate future calls will be made to parse_text.
+
 =item $det->read
 
-read parses the logfile specified with filename=>.  Each line is compared
+Read parses the logfile specified with filename=>.  Each line is compared
 against the regular expressions in turn, forming a list of actions.
 
 =item $det->set
 
-set takes a named parameter list and sets those variables.
+Set takes a named parameter list and sets those variables.
 
 =item $det->summary
 
@@ -500,11 +670,11 @@ were found in the logfile.
 
 =head1 DISTRIBUTION
 
-Log-Detect is part of the L<http://www.veripool.com/> free EDA software
+Log-Detect is part of the L<http://www.veripool.org/> free EDA software
 tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.com/>.
+L<http://www.veripool.org/>.
 
-Copyright 2000-2007 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2009 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

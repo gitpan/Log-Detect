@@ -1,31 +1,19 @@
 #!/usr/bin/perl -w
-#=============================================================================
-# $Id: vtrace 31182 2007-02-01 14:36:21Z wsnyder $
-#=============================================================================
-#
-# This program creates a define group file for waves
-# 
-# Copyright 2000-2007 by Wilson Snyder.  This program is free software;
-# you can redistribute it and/or modify it under the terms of either the GNU
-# Lesser General Public License or the Perl Artistic License.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-#=============================================================================
+# See copyright, etc in below POD section.
+######################################################################
 
 require 5.005;
 use Getopt::Long;
 use IO::File;
-use Pod::Text;
+use Pod::Usage;
 
 use lib "./lib";
 use Log::Detect;
 use Log::Delayed;
 use strict;
-use vars qw($Debug @More_Warnings $Detect);
+use vars qw($Debug @More_Warnings $Detect $VERSION);
+
+$VERSION = '1.423';
 
 #======================================================================
 
@@ -54,6 +42,7 @@ my @files = ();
 if (!GetOptions (
 		 "help"		=> \&usage,
 		 "debug"	=> \&debug,
+		 "version"	=> sub { print "Version $VERSION\n"; exit(0); },
 		 "stderr!"	=> \$opt_stderr,
 		 "append!"	=> \$opt_append,
 		 "warnfatal!"	=> sub {shift; $Detect->set(warn_fatal => shift);},
@@ -63,7 +52,7 @@ if (!GetOptions (
 		 "result=s"	=> \$result_filename,
 		 "<>"		=> \&parameter,
 		 )) {
-    usage();
+    die "%Error: Bad usage, try 'vtrace --help'\n";
 }
 
 ($#files >= 0) or die "%Error: A .log file must be provided.\n";
@@ -90,9 +79,8 @@ exit(defined $stat?10:0);
 #----------------------------------------------------------------------
 
 sub usage {
-    print '$Id: vtrace 31182 2007-02-01 14:36:21Z wsnyder $ ', "\n";
-    $SIG{__WARN__} = sub{};	#pod2text isn't clean.
-    pod2text($0);
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval => 2);
     exit (1);
 }
 
@@ -165,11 +153,11 @@ is missing.
 
 =head1 DISTRIBUTION
 
-Log-Detect is part of the L<http://www.veripool.com/> free EDA software
+Log-Detect is part of the L<http://www.veripool.org/> free EDA software
 tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.com/>.
+L<http://www.veripool.org/>.
 
-Copyright 2000-2007 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2009 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 

@@ -1,17 +1,5 @@
 # Log::Delayed - Delayed error handling
-# $Id: Delayed.pm 31182 2007-02-01 14:36:21Z wsnyder $
-# Author: Wilson Snyder <wsnyder@wsnyder.org>
-######################################################################
-#
-# Copyright 2001-2007 by Wilson Snyder.  This program is free software;
-# you can redistribute it and/or modify it under the terms of either the GNU
-# General Public License or the Perl Artistic License.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
+# See copyright, etc in below POD section.
 ######################################################################
 
 package Log::Delayed;
@@ -25,7 +13,7 @@ use vars qw($VERSION $Global_Delayed @ISA @EXPORT $Debug);
 @ISA = qw(Exporter);
 @EXPORT = qw(die_delayed);
 
-$VERSION = '1.422';
+$VERSION = '1.423';
 
 ######################################################################
 #### Traps
@@ -211,7 +199,7 @@ presented to the user before exiting the program.
 
 In addition, Log::Delayed optionally makes a status file (.status), which
 contains the first error detected.  This allows calling programs to be
-passed more useful tracking information then just the shell exit status.
+passed more useful tracking information than just the shell exit status.
 
 =head1 FUNCTIONS
 
@@ -220,7 +208,7 @@ passed more useful tracking information then just the shell exit status.
 =item $dly->new
 
 New creates a new Log::Delayed object.  Parameters are passed by named
-form.  
+form.
 
 The filename=> parameter specifies the file to be written with the exit
 message, undef for none; defaults to .status.
@@ -299,11 +287,11 @@ errors.
 
 =head1 DISTRIBUTION
 
-Log-Detect is part of the L<http://www.veripool.com/> free EDA software
+Log-Detect is part of the L<http://www.veripool.org/> free EDA software
 tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.com/>.
+L<http://www.veripool.org/>.
 
-Copyright 2000-2007 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2009 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License or the Perl Artistic License.
 
