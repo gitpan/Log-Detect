@@ -3,7 +3,13 @@ Revision history for Perl extension Log::Detect.
 The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
-* Log::Detect 1.423 2008/01/05
+* Log::Detect 1.424 2009/05/19
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+****	Fix ignore files to support GIT.
+
+* Log::Detect 1.423 2009/01/05
 
 **	Log::Detect->new no longer takes a regexp parameter.  Use add_regexp.
 
@@ -59,7 +65,7 @@ This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
 Copyright 2001-2009 by Wilson Snyder.  This program is free software;
 you can redistribute it and/or modify it under the terms of either the GNU
-General Public License or the Perl Artistic License.
+General Public License Version 3 or the Perl Artistic License Version 2.0.
 
 Local variables:
 mode: outline

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Log-Detect
-version:             1.423
+version:             1.424
 abstract:            Parse logfiles to detect errors
 license:             ~
 author:              
